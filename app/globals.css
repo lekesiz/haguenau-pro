@@ -31,3 +31,7 @@ body {
     text-wrap: balance;
   }
 }
+
+
+/* Leaflet CSS */
+@import 'leaflet/dist/leaflet.css';
