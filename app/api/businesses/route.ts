@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
     });
     
     // Mesafe hesaplama (basit Haversine formülü)
-    const businessesWithDistance = businesses.map((business) => {
+    const businessesWithDistance = businesses.map((business: any) => {
       const distance = calculateDistance(
         lat,
         lng,
@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
     });
     
     // Mesafeye göre sırala
-    businessesWithDistance.sort((a, b) => a.distance - b.distance);
+    businessesWithDistance.sort((a: any, b: any) => a.distance - b.distance);
     
     return NextResponse.json({
       data: businessesWithDistance,

@@ -39,8 +39,9 @@ async function getBusiness(id: string): Promise<Business | null> {
   }
 }
 
-export default async function BusinessPage({ params }: { params: { id: string } }) {
-  const business = await getBusiness(params.id);
+export default async function BusinessPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const business = await getBusiness(id);
   
   if (!business) {
     notFound();
@@ -106,7 +107,7 @@ export default async function BusinessPage({ params }: { params: { id: string } 
 
  className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <Clock className="w-5 h-5" />
-                Horaires d'ouverture
+                Horaires d&apos;ouverture
               </h2>
               {'raw' in business.openingHours ? (
                 <p className="text-gray-700">{business.openingHours.raw}</p>
