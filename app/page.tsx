@@ -91,7 +91,7 @@ export default function Home() {
             Découvrez les entreprises locales
           </h2>
           <p className="text-gray-600">
-            Haguenau et ses environs (30 km) - {businesses.length} entreprises
+            Haguenau - {businesses.length} entreprises
           </p>
         </div>
 
@@ -105,7 +105,7 @@ export default function Home() {
               placeholder="Rechercher une entreprise..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent placeholder:text-gray-500"
             />
           </div>
 
