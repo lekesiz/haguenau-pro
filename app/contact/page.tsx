@@ -1,10 +1,7 @@
+'use client';
+
 import Link from 'next/link';
 import { MapPin, Phone, Mail, Clock, Send, MessageSquare, HelpCircle } from 'lucide-react';
-
-export const metadata = {
-  title: 'Contact - Haguenau.pro',
-  description: 'Contactez l\'équipe de Haguenau.pro pour toute question ou suggestion.',
-};
 
 export default function ContactPage() {
   return (
