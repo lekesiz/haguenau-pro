@@ -4,8 +4,8 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "Haguenau.pro - Annuaire des entreprises locales",
-  description: "Découvrez toutes les entreprises de Haguenau et ses environs (30 km). Restaurants, commerces, services et plus encore.",
+  title: "Haguenau.pro - Annuaire des entreprises locales de Haguenau",
+  description: "Découvrez toutes les entreprises de Haguenau. Restaurants, commerces, services et plus encore. Votre annuaire local de référence.",
 };
 
 export default function RootLayout({

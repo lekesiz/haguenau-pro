@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { MapPin, Phone, Mail, Globe, Clock, ArrowLeft, Star } from 'lucide-react';
+import { MapPin, Phone, Mail, Globe, Clock, ArrowLeft, Star, Edit } from 'lucide-react';
 
 interface Business {
   id: number;
@@ -26,7 +26,8 @@ interface Business {
 
 async function getBusiness(id: string): Promise<Business | null> {
   try {
-    const res = await fetch(`http://localhost:3000/api/businesses/${id}`, {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://haguenau-pro.vercel.app';
+    const res = await fetch(`${baseUrl}/api/businesses/${id}`, {
       cache: 'no-store',
     });
     
@@ -58,159 +59,190 @@ export default async function BusinessPage({ params }: { params: Promise<{ id: s
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Retour */}
-      <Link
-        href="/"
-        className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 mb-6"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Retour à la liste
-      </Link>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <div className="container mx-auto px-4 py-8">
+        {/* Retour */}
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-6 font-medium transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Retour à l'annuaire
+        </Link>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Colonne principale */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* En-tête */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">{business.name}</h1>
-                {business.category && (
-                  <span className="inline-block text-sm bg-primary-100 text-primary-700 px-3 py-1 rounded">
-                    {business.category}
-                  </span>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Colonne principale */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* En-tête */}
+            <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
+              <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-6">
+                <div className="flex-1">
+                  <h1 className="text-4xl font-bold text-gray-900 mb-3">{business.name}</h1>
+                  {business.category && (
+                    <span className="inline-block text-sm bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 px-4 py-2 rounded-full font-medium">
+                      {business.category}
+                    </span>
+                  )}
+                </div>
+                {business.rating && (
+                  <div className="flex items-center gap-3 bg-gradient-to-r from-yellow-50 to-orange-50 px-6 py-4 rounded-xl border border-yellow-200">
+                    <Star className="w-8 h-8 fill-yellow-400 text-yellow-400" />
+                    <div>
+                      <div className="text-2xl font-bold text-gray-900">{business.rating.toFixed(1)}</div>
+                      {business.reviewCount && (
+                        <div className="text-xs text-gray-600">{business.reviewCount} avis</div>
+                      )}
+                    </div>
+                  </div>
                 )}
               </div>
-              {business.rating && (
-                <div className="flex items-center gap-2 bg-yellow-50 px-4 py-2 rounded-lg">
-                  <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
-                  <div>
-                    <div className="text-xl font-bold">{business.rating.toFixed(1)}</div>
-                    {business.reviewCount && (
-                      <div className="text-xs text-gray-600">{business.reviewCount} avis</div>
-                    )}
-                  </div>
+
+              {business.description && (
+                <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                  <p className="text-gray-700 leading-relaxed text-lg">{business.description}</p>
                 </div>
               )}
+
+              {/* Note pour les utilisateurs */}
+              <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start space-x-3">
+                  <Edit className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h3 className="font-semibold text-blue-900 mb-1">Vous êtes le propriétaire ?</h3>
+                    <p className="text-sm text-blue-700">
+                      Contactez-nous pour ajouter plus d'informations, des photos et gérer votre fiche entreprise.
+                    </p>
+                    <Link href="/contact" className="inline-block mt-2 text-sm font-medium text-blue-600 hover:text-blue-700 underline">
+                      Nous contacter →
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {business.description && (
-              <p className="text-gray-700 leading-relaxed">{business.description}</p>
+            {/* Horaires d'ouverture */}
+            {business.openingHours && (
+              <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                  <div className="bg-blue-100 p-2 rounded-lg">
+                    <Clock className="w-6 h-6 text-blue-600" />
+                  </div>
+                  Horaires d'ouverture
+                </h2>
+                {'raw' in business.openingHours ? (
+                  <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                    <p className="text-gray-700 text-lg">{business.openingHours.raw}</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {Object.entries(business.openingHours).map(([day, hours]) => (
+                      <div key={day} className="flex justify-between items-center py-3 px-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                        <span className="font-semibold text-gray-800">{dayNames[day]}</span>
+                        <span className={`font-medium ${hours === 'closed' ? 'text-red-600' : 'text-green-600'}`}>
+                          {hours === 'closed' ? 'Fermé' : hours}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             )}
           </div>
 
-          {/* Horaires d'ouverture */}
-          {business.openingHours && (
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2
-
- className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Clock className="w-5 h-5" />
-                Horaires d&apos;ouverture
-              </h2>
-              {'raw' in business.openingHours ? (
-                <p className="text-gray-700">{business.openingHours.raw}</p>
-              ) : (
-                <div className="space-y-2">
-                  {Object.entries(business.openingHours).map(([day, hours]) => (
-                    <div key={day} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-0">
-                      <span className="font-medium text-gray-700">{dayNames[day]}</span>
-                      <span className={hours === 'closed' ? 'text-red-600' : 'text-gray-900'}>
-                        {hours === 'closed' ? 'Fermé' : hours}
-                      </span>
+          {/* Colonne latérale */}
+          <div className="space-y-6">
+            {/* Informations de contact */}
+            <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Contact</h2>
+              <div className="space-y-5">
+                {business.address && (
+                  <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="bg-blue-100 p-2 rounded-lg flex-shrink-0">
+                      <MapPin className="w-5 h-5 text-blue-600" />
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Colonne latérale */}
-        <div className="space-y-6">
-          {/* Informations de contact */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Contact</h2>
-            <div className="space-y-4">
-              {business.address && (
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-primary-600 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <div className="text-gray-900">{business.address}</div>
-                    {(business.postalCode || business.city) && (
-                      <div className="text-gray-600">
-                        {business.postalCode} {business.city}
-                      </div>
-                    )}
+                    <div>
+                      <div className="font-medium text-gray-900">{business.address}</div>
+                      {(business.postalCode || business.city) && (
+                        <div className="text-gray-600 mt-1">
+                          {business.postalCode} {business.city}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {business.phone && (
-                <div className="flex items-center gap-3">
-                  <Phone className="w-5 h-5 text-primary-600 flex-shrink-0" />
-                  <a
-                    href={`tel:${business.phone}`}
-                    className="text-gray-900 hover:text-primary-600 transition-colors"
-                  >
-                    {business.phone}
-                  </a>
-                </div>
-              )}
+                {business.phone && (
+                  <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="bg-green-100 p-2 rounded-lg flex-shrink-0">
+                      <Phone className="w-5 h-5 text-green-600" />
+                    </div>
+                    <a
+                      href={`tel:${business.phone}`}
+                      className="font-medium text-gray-900 hover:text-blue-600 transition-colors"
+                    >
+                      {business.phone}
+                    </a>
+                  </div>
+                )}
 
-              {business.email && (
-                <div className="flex items-center gap-3">
-                  <Mail className="w-5 h-5 text-primary-600 flex-shrink-0" />
-                  <a
-                    href={`mailto:${business.email}`}
-                    className="text-gray-900 hover:text-primary-600 transition-colors truncate"
-                  >
-                    {business.email}
-                  </a>
-                </div>
-              )}
+                {business.email && (
+                  <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="bg-purple-100 p-2 rounded-lg flex-shrink-0">
+                      <Mail className="w-5 h-5 text-purple-600" />
+                    </div>
+                    <a
+                      href={`mailto:${business.email}`}
+                      className="font-medium text-gray-900 hover:text-blue-600 transition-colors truncate"
+                    >
+                      {business.email}
+                    </a>
+                  </div>
+                )}
 
-              {business.website && (
-                <div className="flex items-center gap-3">
-                  <Globe className="w-5 h-5 text-primary-600 flex-shrink-0" />
-                  <a
-                    href={business.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-900 hover:text-primary-600 transition-colors truncate"
-                  >
-                    Visiter le site web
-                  </a>
-                </div>
-              )}
+                {business.website && (
+                  <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="bg-orange-100 p-2 rounded-lg flex-shrink-0">
+                      <Globe className="w-5 h-5 text-orange-600" />
+                    </div>
+                    <a
+                      href={business.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium text-gray-900 hover:text-blue-600 transition-colors truncate"
+                    >
+                      Visiter le site web
+                    </a>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* Carte */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Localisation</h2>
-            <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
-              <iframe
-                width="100%"
-                height="100%"
-                frameBorder="0"
-                style={{ border: 0 }}
-                src={`https://www.openstreetmap.org/export/embed.html?bbox=${business.location.lng - 0.01},${business.location.lat - 0.01},${business.location.lng + 0.01},${business.location.lat + 0.01}&layer=mapnik&marker=${business.location.lat},${business.location.lng}`}
-                allowFullScreen
-              />
+            {/* Carte */}
+            <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Localisation</h2>
+              <div className="aspect-video bg-gray-100 rounded-xl overflow-hidden shadow-inner">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  frameBorder="0"
+                  style={{ border: 0 }}
+                  src={`https://www.openstreetmap.org/export/embed.html?bbox=${business.location.lng - 0.01},${business.location.lat - 0.01},${business.location.lng + 0.01},${business.location.lat + 0.01}&layer=mapnik&marker=${business.location.lat},${business.location.lng}`}
+                  allowFullScreen
+                />
+              </div>
+              <a
+                href={`https://www.openstreetmap.org/?mlat=${business.location.lat}&mlon=${business.location.lng}#map=16/${business.location.lat}/${business.location.lng}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block mt-4 text-center text-sm font-medium text-blue-600 hover:text-blue-700 bg-blue-50 py-3 rounded-lg hover:bg-blue-100 transition-colors"
+              >
+                Voir sur OpenStreetMap →
+              </a>
             </div>
-            <a
-              href={`https://www.openstreetmap.org/?mlat=${business.location.lat}&mlon=${business.location.lng}#map=16/${business.location.lat}/${business.location.lng}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block mt-3 text-sm text-primary-600 hover:text-primary-700 text-center"
-            >
-              Voir sur OpenStreetMap
-            </a>
           </div>
         </div>
       </div>
     </div>
   );
 }
+
